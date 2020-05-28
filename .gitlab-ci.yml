@@ -1,0 +1,21 @@
+variables:
+  GIT_DEPTH: 1
+stages:
+  - backup
+citest:
+  stage: backup
+  only:
+  - schedules
+  script:
+    - export BORG_FILES_CACHE_TTL=365
+    - export BORG_PASSCOMMAND="cat /home/gitlab-runner/.borg-passphrase"
+    # - export VERBOSE=1
+    # - export SAVELOGSONSUCCES=1
+    - ./borg2S3.sh /bin rootbin bucket4backup.example.com
+  tags:
+    - node1
+  artifacts:
+    when: on_failure
+    paths:
+    - error.log
+    expire_in: 1 month
